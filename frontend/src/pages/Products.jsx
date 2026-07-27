@@ -1,0 +1,652 @@
+import React, { useContext, useEffect, useState } from 'react'
+import { Link, useParams, useNavigate } from 'react-router-dom'
+import { ShopContext } from '../context/ShopContext'
+import RelatedProducts from '../components/RelatedProducts'
+import { FaFacebookF, FaInstagram, FaTwitter, FaWhatsapp } from 'react-icons/fa'
+import { toast } from 'react-toastify'
+import SimilarColorProducts from '../components/SimilarColorProducts'
+import ProductAccordion from '../components/ProductAccordian'
+import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from 'react-icons/md'
+import ReviewSection from '../components/ReviewSection'
+import { motion, AnimatePresence } from 'framer-motion'
+import brand from '../brand'
+import { productGallery, productThumb } from '../utils/cloudinary'
+
+const Products = () => {
+  const { productId } = useParams()
+  const { products, currency, addToCart, navigate } = useContext(ShopContext)
+  const [productData, setProductData] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [image, setImage] = useState('')
+  const [size, setSize] = useState('')
+  const [showAddToCartPopup, setShowAddToCartPopup] = useState(false)
+  const [isImageZoomed, setIsImageZoomed] = useState(false)
+  const [touchStart, setTouchStart] = useState(null)
+  const [touchEnd, setTouchEnd] = useState(null)
+
+  const navigateBack = useNavigate()
+  const shareUrl = typeof window !== 'undefined' ? window.location.href : ''
+
+  const minSwipeDistance = 50
+
+  const onTouchStart = (e) => {
+    setTouchEnd(null)
+    setTouchStart(e.targetTouches[0].clientX)
+  }
+
+  const onTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX)
+  }
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return
+
+    const distance = touchStart - touchEnd
+    const isLeftSwipe = distance > minSwipeDistance
+    const isRightSwipe = distance < -minSwipeDistance
+
+    if (productData && productData.image && productData.image.length > 0) {
+      const currentIndex = productData.image.indexOf(image)
+
+      if (isLeftSwipe) {
+        const nextIndex = (currentIndex + 1) % productData.image.length
+        setImage(productData.image[nextIndex])
+      } else if (isRightSwipe) {
+        const prevIndex = (currentIndex - 1 + productData.image.length) % productData.image.length
+        setImage(productData.image[prevIndex])
+      }
+    }
+  }
+
+  useEffect(() => {
+    const fetchProductData = async () => {
+      setLoading(true)
+      setError(null)
+
+      try {
+        const foundInList = products?.find(item => item._id === productId)
+        if (foundInList) {
+          setProductData(foundInList)
+          setImage(foundInList.image?.[0] || '')
+          setError(null)
+          setLoading(false)
+          return
+        }
+
+        const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/product/${productId}`)
+        const data = await res.json()
+        if (data.success && data.product) {
+          setProductData(data.product)
+          setImage(data.product.image?.[0] || '')
+          setError(null)
+        } else {
+          setError('Product not found')
+        }
+      } catch (err) {
+        console.error('Error fetching product:', err)
+        setError('Failed to load product')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchProductData()
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [productId, products])
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(shareUrl)
+    toast.success('Link copied to clipboard!')
+  }
+
+  const handleAddToCart = () => {
+    if (!productData) return
+
+    if (productData.availableQuantity <= 0) {
+      toast.error('Out of Stock')
+      return
+    }
+    if (productData.sizes && productData.sizes.length > 0 && !size) {
+      toast.warning('Please select a size')
+      return
+    }
+    addToCart(productData._id, size || 'Standard')
+    setShowAddToCartPopup(true)
+
+    setTimeout(() => setShowAddToCartPopup(false), 3000)
+  }
+
+  const nextImage = () => {
+    if (productData && productData.image && productData.image.length > 0) {
+      const currentIndex = productData.image.indexOf(image)
+      const nextIndex = (currentIndex + 1) % productData.image.length
+      setImage(productData.image[nextIndex])
+    }
+  }
+
+  const prevImage = () => {
+    if (productData && productData.image && productData.image.length > 0) {
+      const currentIndex = productData.image.indexOf(image)
+      const prevIndex = (currentIndex - 1 + productData.image.length) % productData.image.length
+      setImage(productData.image[prevIndex])
+    }
+  }
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2
+      }
+    }
+  }
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 100,
+        damping: 12
+      }
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-tz-cream">
+        <div className="text-center">
+          <motion.div
+            animate={{
+              scale: [1, 1.2, 1],
+              rotate: [0, 360],
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className="w-20 h-20 border-4 border-gray-300 border-t-black rounded-full mx-auto mb-4"
+          />
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-gray-600"
+          >
+            Loading product...
+          </motion.p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error || !productData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-tz-cream px-4">
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className="text-center max-w-md"
+        >
+          <motion.div
+            animate={{
+              y: [0, -10, 0],
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+            }}
+            className="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6"
+          >
+            <svg className="w-12 h-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </motion.div>
+          <h2 className="text-2xl font-bold mb-2">Product Not Found</h2>
+          <p className="text-gray-600 mb-6">
+            {error || "The product you're looking for doesn't exist or has been removed."}
+          </p>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => navigate('/shop')}
+            className="bg-tz-navy text-white hover:bg-tz-pink hover:text-white transition-colors duration-300 px-8 py-3 rounded-xl font-medium"
+          >
+            Browse Collection
+          </motion.button>
+        </motion.div>
+      </div>
+    )
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="min-h-screen bg-tz-cream pb-10"
+    >
+      {/* Mobile Header */}
+      <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-gray-100 px-4 py-3 flex items-center justify-between lg:hidden">
+        <motion.button
+          whileTap={{ scale: 0.9 }}
+          onClick={() => navigateBack(-1)}
+          className="p-1 -ml-1"
+        >
+          <MdKeyboardArrowLeft className="text-2xl" />
+        </motion.button>
+        <h1 className="font-bold text-lg tracking-tighter">{brand.shortName.toUpperCase()}</h1>
+        <div className="w-8" />
+      </div>
+
+      <div className="pt-4 sm:pt-6 lg:pt-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className='flex flex-col lg:flex-row gap-6 lg:gap-10'
+        >
+          {/* Product Images Section */}
+          <motion.div variants={itemVariants} className='flex-1'>
+            <div className='flex flex-col-reverse lg:flex-row gap-3'>
+              {/* Thumbnail Images - Horizontal scroll on mobile, vertical on desktop */}
+              {productData.image && productData.image.length > 0 && (
+                <motion.div
+                  variants={itemVariants}
+                  className='flex lg:flex-col gap-2 overflow-x-auto lg:overflow-y-auto pb-2 lg:pb-0 no-scrollbar'
+                  style={{ maxHeight: '500px' }}
+                >
+                  {productData.image.map((item, index) => (
+                    <img
+                      key={item || index}
+                      onClick={() => setImage(item)}
+                      src={productThumb(item)}
+                      alt={`Product view ${index + 1}`}
+                      width={80}
+                      height={80}
+                      loading="lazy"
+                      decoding="async"
+                      className={`w-16 h-16 lg:w-20 lg:h-20 object-cover rounded-xl cursor-pointer border-2 transition-all duration-300 flex-shrink-0 hover:scale-105 ${
+                        image === item ? 'border-black shadow-lg' : 'border-transparent hover:border-gray-300'
+                      }`}
+                    />
+                  ))}
+                </motion.div>
+              )}
+
+              {/* Main Image with Swipe Functionality */}
+              <motion.div
+                variants={itemVariants}
+                className='relative flex-1 mt-6 overflow-hidden rounded-2xl bg-gray-100'
+                onTouchStart={onTouchStart}
+                onTouchMove={onTouchMove}
+                onTouchEnd={onTouchEnd}
+              >
+                <motion.img
+                  key={image}
+                  initial={{ opacity: 0, scale: 0.98 }}
+                  animate={{ opacity: 1, scale: isImageZoomed ? 1.5 : 1 }}
+                  transition={{ duration: 0.25 }}
+                  src={productGallery(image || productData.image?.[0])}
+                  alt={productData.name}
+                  width={900}
+                  height={1100}
+                  decoding="async"
+                  className={`w-full h-auto cursor-${isImageZoomed ? 'zoom-out' : 'zoom-in'} transition-all duration-300 rounded-2xl`}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setIsImageZoomed(!isImageZoomed)
+                  }}
+                />
+
+                {/* Navigation Arrows for Mobile */}
+                {productData.image && productData.image.length > 1 && !isImageZoomed && (
+                  <>
+                    <button
+                      onClick={prevImage}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all lg:hidden"
+                    >
+                      <MdKeyboardArrowLeft className="text-xl" />
+                    </button>
+                    <button
+                      onClick={nextImage}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all lg:hidden"
+                    >
+                      <MdKeyboardArrowRight className="text-xl" />
+                    </button>
+                  </>
+                )}
+
+                {/* Image Counter */}
+                {productData.image && productData.image.length > 1 && (
+                  <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/70 text-white px-3 py-1 rounded-full text-sm backdrop-blur-sm">
+                    {productData.image.indexOf(image) + 1} / {productData.image.length}
+                  </div>
+                )}
+
+                {/* Zoom Hint */}
+                {!isImageZoomed && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 0.6 }}
+                    className="hidden lg:block absolute bottom-4 right-4 bg-tz-navy text-white hover:bg-tz-pink hover:text-white transition-colors duration-300 p-2 rounded-full text-xs"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                    </svg>
+                  </motion.div>
+                )}
+
+                {/* Swipe Hint for Mobile */}
+                {productData.image && productData.image.length > 1 && !isImageZoomed && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="lg:hidden absolute top-4 right-4 bg-black/70 text-white px-3 py-1 rounded-full text-xs flex items-center gap-1 backdrop-blur-sm"
+                  >
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    <span>Swipe</span>
+                  </motion.div>
+                )}
+              </motion.div>
+            </div>
+          </motion.div>
+
+          {/* Product Information */}
+          <motion.div variants={itemVariants} className='flex-1 space-y-5'>
+            {/* Category and Name */}
+            <div>
+              <motion.p variants={itemVariants} className='text-sm text-gray-500 uppercase tracking-wider'>
+                {productData.subCategory || 'Category'}
+              </motion.p>
+              <h1 className='font-bold text-2xl lg:text-3xl text-gray-800 mt-1 leading-tight'>
+                {productData.name}
+              </h1>
+            </div>
+
+            {/* Price */}
+            <motion.div variants={itemVariants} className='flex items-baseline gap-3'>
+              <span className='text-3xl lg:text-4xl font-bold'>
+                {currency}{productData.price}
+              </span>
+              {productData.oldPrice && (
+                <span className='text-lg lg:text-xl text-gray-400 line-through'>
+                  {currency}{productData.oldPrice}
+                </span>
+              )}
+              {productData.oldPrice && (
+                <span className='bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full'>
+                  Save {currency}{productData.oldPrice - productData.price}
+                </span>
+              )}
+            </motion.div>
+
+            {/* Colors Available - Mobile */}
+            {productData.secondaryName && (
+              <motion.div variants={itemVariants} className='lg:hidden'>
+                <p className='text-sm font-medium mb-2'>Colors available</p>
+                <SimilarColorProducts secondaryName={productData.secondaryName} />
+              </motion.div>
+            )}
+
+            {/* Material & details */}
+            {(productData.material || productData.dimensions || productData.department) && (
+              <motion.div variants={itemVariants} className="border border-tz-pink/15 bg-tz-cream/60 px-4 py-3 space-y-1.5">
+                {productData.department && (
+                  <p className="text-xs text-tz-navy/70">
+                    <span className="font-semibold text-tz-navy uppercase tracking-wider text-[10px]">Department</span>
+                    <span className="ml-2 capitalize">{productData.department.replace(/-/g, " ")}</span>
+                    {productData.category ? <span className="text-tz-navy/40"> · {productData.category}</span> : null}
+                  </p>
+                )}
+                {productData.material && (
+                  <p className="text-xs text-tz-navy/70">
+                    <span className="font-semibold text-tz-navy uppercase tracking-wider text-[10px]">Material</span>
+                    <span className="ml-2">{productData.material}</span>
+                  </p>
+                )}
+                {productData.dimensions && (
+                  <p className="text-xs text-tz-navy/70">
+                    <span className="font-semibold text-tz-navy uppercase tracking-wider text-[10px]">Dimensions</span>
+                    <span className="ml-2">{productData.dimensions}</span>
+                  </p>
+                )}
+                {productData.gender && (
+                  <p className="text-xs text-tz-navy/70">
+                    <span className="font-semibold text-tz-navy uppercase tracking-wider text-[10px]">Fit</span>
+                    <span className="ml-2 capitalize">{productData.gender}</span>
+                  </p>
+                )}
+              </motion.div>
+            )}
+
+            {/* Size Selection */}
+            {productData.sizes && productData.sizes.length > 0 && (
+              <motion.div variants={itemVariants} className='space-y-3'>
+                <div className='flex items-center justify-between'>
+                  <p className='font-medium text-sm'>Select Size</p>
+                  {productData.department === 'men' || productData.department === 'women' ? (
+                    <span className="text-[11px] text-tz-navy/45">True to size for leather apparel</span>
+                  ) : null}
+                </div>
+
+                <div className='flex flex-wrap gap-2'>
+                  {productData.sizes.map((item, index) => (
+                    <motion.button
+                      key={index}
+                      whileHover={{ scale: 1.03 }}
+                      whileTap={{ scale: 0.97 }}
+                      onClick={() => setSize(item)}
+                      className={`min-w-[60px] px-4 py-2.5 rounded-xl border-2 transition-all duration-300 text-sm font-medium ${
+                        item === size
+                          ? 'bg-tz-navy text-white hover:bg-tz-pink hover:text-white transition-colors duration-300 border-black shadow-md'
+                          : 'bg-gray-100 border-gray-200 hover:border-gray-400'
+                      }`}
+                    >
+                      {item}
+                    </motion.button>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+            {/* Colors Available - Desktop */}
+            {productData.secondaryName && (
+              <motion.div variants={itemVariants} className='hidden lg:block'>
+                <p className='font-medium mb-2'>Colors available</p>
+                <SimilarColorProducts secondaryName={productData.secondaryName} />
+              </motion.div>
+            )}
+
+            {/* Stock Status */}
+            <motion.div variants={itemVariants}>
+              {productData.availableQuantity > 0 ? (
+                <div className='flex items-center gap-2 text-sm text-green-600 bg-green-50 px-3 py-2 rounded-lg inline-flex'>
+                  <span className='w-2 h-2 bg-green-600 rounded-full animate-pulse'></span>
+                  In Stock ({productData.availableQuantity} available)
+                </div>
+              ) : (
+                <div className='flex items-center gap-2 text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg inline-flex'>
+                  <span className='w-2 h-2 bg-red-600 rounded-full animate-pulse'></span>
+                  Out of Stock
+                </div>
+              )}
+            </motion.div>
+
+            {/* Add to Cart Button */}
+            <motion.div variants={itemVariants} className='pt-2'>
+              <motion.button
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleAddToCart}
+                disabled={productData.availableQuantity <= 0}
+                className={`w-full py-4 rounded-xl text-sm font-semibold tracking-wider transition-all duration-300 flex items-center justify-center gap-2 ${
+                  productData.availableQuantity <= 0
+                    ? 'bg-gray-300 cursor-not-allowed'
+                    : 'bg-tz-navy text-white hover:bg-tz-pink hover:text-white transition-colors duration-300 hover:bg-gray-800 shadow-lg hover:shadow-xl'
+                }`}
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+                ADD TO CART
+              </motion.button>
+            </motion.div>
+
+            {/* Share Section */}
+            <motion.div variants={itemVariants} className='pt-2'>
+              <p className='text-xs font-medium text-gray-500 mb-3'>Share this product</p>
+              <div className='flex gap-4'>
+                {[
+                  { icon: FaFacebookF, color: 'hover:text-blue-600', url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}` },
+                  { icon: FaWhatsapp, color: 'hover:text-green-500', url: `https://api.whatsapp.com/send?text=${encodeURIComponent(shareUrl)}` },
+                  { icon: FaInstagram, color: 'hover:text-pink-500', url: 'https://www.instagram.com' },
+                  { icon: FaTwitter, color: 'hover:text-blue-400', url: `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}` },
+                ].map((social, index) => (
+                  <motion.a
+                    key={index}
+                    whileHover={{ scale: 1.1, rotate: 5 }}
+                    whileTap={{ scale: 0.9 }}
+                    href={social.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      copyToClipboard()
+                    }}
+                    className={`text-gray-500 ${social.color} transition-colors cursor-pointer`}
+                  >
+                    <social.icon size={18} />
+                  </motion.a>
+                ))}
+              </div>
+            </motion.div>
+          </motion.div>
+        </motion.div>
+
+        {/* Product Accordions */}
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className='mt-8'
+        >
+          {productData.description && (
+            <ProductAccordion title="DESCRIPTION / DETAILS">
+              <motion.div variants={itemVariants} className="space-y-2">
+                {productData.description
+                  .split('.')
+                  .filter(sentence => sentence.trim().length > 0)
+                  .map((sentence, index) => (
+                    <motion.p
+                      key={index}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                      className='text-gray-600 text-sm'
+                    >
+                      • {sentence.trim()}.
+                    </motion.p>
+                  ))}
+              </motion.div>
+            </ProductAccordion>
+          )}
+
+          <ProductAccordion title="RETURNS & EXCHANGE">
+            <motion.div variants={itemVariants} className="space-y-2">
+              {[
+                "100% Original Product",
+                "Cash on Delivery is available on this product",
+                "Easy Return Policy within 7 days",
+                "Free shipping on orders above ₹999"
+              ].map((text, index) => (
+                <motion.p
+                  key={index}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  className='flex items-center gap-2 text-gray-600 text-sm'
+                >
+                  <span className='w-1.5 h-1.5 bg-black rounded-full'></span>
+                  {text}
+                </motion.p>
+              ))}
+            </motion.div>
+          </ProductAccordion>
+        </motion.div>
+
+        {/* Reviews Section */}
+        <motion.div
+          variants={itemVariants}
+          initial="hidden"
+          animate="visible"
+          className='mt-8'
+        >
+          <ReviewSection productId={productData._id} />
+        </motion.div>
+
+        {/* Related Products */}
+        <motion.div
+          variants={itemVariants}
+          initial="hidden"
+          animate="visible"
+          className='mt-10'
+        >
+          <RelatedProducts
+            category={productData.category}
+            subCategory={productData.subCategory}
+            color={productData.color}
+          />
+        </motion.div>
+      </div>
+
+      {/* Add to Cart Success Popup */}
+      <AnimatePresence>
+        {showAddToCartPopup && (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 50 }}
+            className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 w-[90%] max-w-sm"
+          >
+            <div className="bg-white rounded-2xl shadow-2xl p-4 border-l-4 border-green-500">
+              <div className="flex items-center gap-3">
+                <motion.div
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ duration: 0.5 }}
+                  className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center"
+                >
+                  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </motion.div>
+                <div className="flex-1">
+                  <p className="font-semibold text-sm">Added to Cart!</p>
+                  <p className="text-xs text-gray-500">{productData.name} - Size {size}</p>
+                </div>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => navigate('/cart')}
+                  className="bg-tz-navy text-white hover:bg-tz-pink hover:text-white transition-colors duration-300 px-4 py-2 rounded-lg text-xs font-medium"
+                >
+                  View Cart
+                </motion.button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+    </motion.div>
+  )
+}
+
+export default Products
