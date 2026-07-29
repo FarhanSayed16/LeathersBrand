@@ -102,7 +102,6 @@ export const createShipment = async (req, res) => {
       breadth: result.package?.breadth ?? order.shipping.breadth,
       height: result.package?.height ?? order.shipping.height,
       chargedFee: order.shipping.chargedFee,
-      return: order.shipping.return || undefined,
     };
 
     for (const item of order.items) {

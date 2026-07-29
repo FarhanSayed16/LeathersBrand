@@ -9,7 +9,7 @@ import { toast } from 'react-toastify'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const Cart = () => {
-  const { products, currency, cartItems, updateQuantity, navigate, getCartAmount } =
+  const { products, formatPrice, cartItems, updateQuantity, navigate, getCartAmount } =
     useContext(ShopContext)
 
   const [cartData, setCartData] = useState([])
@@ -251,7 +251,7 @@ const Cart = () => {
                                   animate={{ scale: 1, color: '#374151' }}
                                   className="font-semibold text-sm sm:text-base"
                                 >
-                                  {currency}{productData.price}
+                                  {formatPrice(productData.price)}
                                 </motion.span>
                                 <motion.span 
                                   whileHover={{ scale: 1.1, backgroundColor: '#e5e7eb' }}
@@ -326,7 +326,7 @@ const Cart = () => {
                               } : {}}
                             >
                               Total: <span className="font-semibold text-black">
-                                {currency}{productData.price * item.quantity}
+                                {formatPrice(productData.price * item.quantity)}
                               </span>
                             </motion.div>
                           </div>
@@ -506,7 +506,7 @@ const Cart = () => {
         </motion.div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         /* Custom Scrollbar */
         ::-webkit-scrollbar {
           width: 8px;

@@ -2,7 +2,7 @@ import { useContext } from "react"
 import { ShopContext } from "../context/ShopContext"
 
 const CheckoutSummary = () => {
-  const { getCartAmount, delivery_fee } = useContext(ShopContext)
+  const { formatPrice, getCartAmount, delivery_fee } = useContext(ShopContext)
 
   return (
     <div className="bg-white p-6 rounded-xl shadow sticky top-24 h-fit">
@@ -10,19 +10,19 @@ const CheckoutSummary = () => {
 
       <div className="flex justify-between mb-2">
         <span>Subtotal</span>
-        <span>₹ {getCartAmount()}</span>
+        <span>{formatPrice(getCartAmount())}</span>
       </div>
 
       <div className="flex justify-between mb-2">
         <span>Shipping</span>
-        <span>₹ {delivery_fee}</span>
+        <span>{formatPrice(delivery_fee)}</span>
       </div>
 
       <hr className="my-3" />
 
       <div className="flex justify-between font-semibold text-lg">
         <span>Total</span>
-        <span>₹ {getCartAmount() + delivery_fee}</span>
+        <span>{formatPrice(getCartAmount() + delivery_fee)}</span>
       </div>
 
       <button

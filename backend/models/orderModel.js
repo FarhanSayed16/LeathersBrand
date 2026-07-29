@@ -102,7 +102,7 @@ const orderSchema = new mongoose.Schema({
   },
   orderFrom: {
     type: String,
-    enum: ["USER"],
+    enum: ["USER", "web", "app", "admin"],
     default: "USER"
   },
 

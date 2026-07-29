@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import Title from '../components/Title'
 import CartTotal from '../components/CartTotal'
-import { assets } from '../assets/assets'
+
 import { ShopContext } from '../context/ShopContext'
 import axios from 'axios'
 import { toast } from 'react-toastify'
@@ -24,7 +24,9 @@ const {
   delivery_fee,
   products,
   appliedCoupon,
-  settings
+  settings,
+  formatPrice,
+  selectedCurrency
 } = useContext(ShopContext)
 
 const [formData, setFormData] = useState({
@@ -524,10 +526,10 @@ const onSubmitHandler = async (event) => {
           Delivery available
           {pinCheck.estimatedDays ? ` · ETA ${pinCheck.estimatedDays}` : ''}
           {pinCheck.dynamicRates && pinCheck.deliveryFee != null
-            ? ` · shipping ₹${pinCheck.deliveryFee}`
+            ? ` · shipping ${formatPrice(pinCheck.deliveryFee)}`
             : ''}
           {!pinCheck.dynamicRates && pinCheck.estimatedRate != null
-            ? ` · courier est. ₹${pinCheck.estimatedRate}`
+            ? ` · courier est. ${formatPrice(pinCheck.estimatedRate)}`
             : ''}
         </p>
       )}
@@ -580,8 +582,8 @@ const onSubmitHandler = async (event) => {
             {method === 'partial' && previewAdvance && (
               <div className='mb-6 rounded-xl border border-tz-navy/10 bg-tz-cream/60 p-3 text-sm space-y-1'>
                 <p className='font-semibold text-tz-navy'>Partial payment breakdown</p>
-                <p className='text-gray-700 flex justify-between'><span>Pay now ({previewAdvance.advancePercent}%)</span><span>₹{previewAdvance.advanceAmount}</span></p>
-                <p className='text-gray-700 flex justify-between'><span>Pay on delivery</span><span>₹{previewAdvance.balanceAmount}</span></p>
+                <p className='text-gray-700 flex justify-between'><span>Pay now ({previewAdvance.advancePercent}%)</span><span>{formatPrice(previewAdvance.advanceAmount)}</span></p>
+                <p className='text-gray-700 flex justify-between'><span>Pay on delivery</span><span>{formatPrice(previewAdvance.balanceAmount)}</span></p>
                 <p className='text-[11px] text-gray-500 pt-1 leading-relaxed'>
                   {partialConfig?.policyNotice}
                 </p>
@@ -629,9 +631,9 @@ const onSubmitHandler = async (event) => {
                     </div>
                     <div>
                       <img 
-                        src={assets.razorpay_logo} 
+                        src="https://upload.wikimedia.org/wikipedia/commons/8/89/Razorpay_logo.svg" 
                         alt="Razorpay" 
-                        className='h-6 object-contain'
+                        className='h-5 object-contain'
                       />
                       <p className='text-[11px] text-gray-500 mt-1'>Pay full amount online</p>
                     </div>
@@ -678,7 +680,7 @@ const onSubmitHandler = async (event) => {
                       </p>
                       <p className='text-[11px] text-gray-500 mt-0.5'>
                         Advance via Razorpay · rest on delivery
-                        {previewAdvance ? ` · now ₹${previewAdvance.advanceAmount}` : ''}
+                        {previewAdvance ? ` · now ${formatPrice(previewAdvance.advanceAmount)}` : ''}
                       </p>
                     </div>
                   </div>
@@ -761,6 +763,11 @@ const onSubmitHandler = async (event) => {
             </motion.div>
 
             {/* Secure Payment Badge */}
+            {selectedCurrency !== 'INR' && (
+              <div className="mt-4 text-center text-[11.5px] text-gray-500 font-medium">
+                *You will be charged in INR at checkout. Your bank will automatically convert this at their current rate.
+              </div>
+            )}
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -776,7 +783,7 @@ const onSubmitHandler = async (event) => {
         </motion.div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         .input-highlight {
           animation: highlight 0.3s ease-out;
         }

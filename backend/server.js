@@ -22,6 +22,7 @@ import adminHeroRoutes from "./routes/adminHeroRoutes.js";
 import settingsRoutes from "./routes/settingsRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import instagramPromoRoutes from "./routes/instagramPromoRoutes.js";
+import exchangeRateRouter from "./routes/exchangeRateRoute.js";
 
 // ✅ IMPORT CONTACT ROUTE
 import contactRoutes from "./routes/contactRoutes.js";
@@ -42,7 +43,16 @@ const allowedOrigins = [
   "https://g6xrghvh-5174.inc1.devtunnels.ms"
 ].filter(Boolean);
 
-app.use(cors({ origin: allowedOrigins }));
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(null, true); // Allow all origins for devtunnels
+    }
+  },
+  credentials: true
+}));
 
 // Rate Limiter — general API
 const limiter = rateLimit({
@@ -79,6 +89,7 @@ app.use("/api/video-reviews", videoReviewRouter);
 app.use("/api/settings", settingsRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/instagram", instagramPromoRoutes);
+app.use("/api/exchange-rates", exchangeRateRouter);
 
 // Test route
 app.get("/", (req, res) => {
@@ -89,3 +100,4 @@ app.get("/", (req, res) => {
 app.listen(port, () => console.log("Server Started on PORT: " + port));
 
 export default app;
+// Trigger nodemon restart

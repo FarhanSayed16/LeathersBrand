@@ -11,6 +11,7 @@ import {
   FaThLarge,
 } from "react-icons/fa";
 import brand from "../brand";
+import CurrencySelector from "./CurrencySelector";
 
 const FALLBACK_NAV = [
   { name: "Home", label: "Home", path: "/" },
@@ -232,6 +233,7 @@ const Navbar = () => {
             </nav>
 
             <div className="flex items-center gap-0.5">
+              <CurrencySelector />
               <button
                 type="button"
                 aria-label="Search"

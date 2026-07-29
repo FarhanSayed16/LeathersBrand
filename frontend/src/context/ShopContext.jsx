@@ -3,11 +3,15 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import brand from "../brand";
+import { formatPriceUtil } from "../utils/currency";
 
 export const ShopContext = createContext();
 
 const ShopContextProvider = (props) => {
-  const currency = brand.commerce.currencySymbol;
+  const [selectedCurrency, setSelectedCurrency] = useState(
+    () => localStorage.getItem("currency") || "INR"
+  );
+  const [exchangeRates, setExchangeRates] = useState({ USD: 0, GBP: 0, CAD: 0 });
   const [delivery_fee, setDeliveryFee] = useState(brand.commerce.deliveryFee);
   const [settings, setSettings] = useState(null);
   const [search, setSearch] = useState("");
@@ -277,12 +281,28 @@ const ShopContextProvider = (props) => {
       getUserCart(token);
       getUserWishlist(token);
     }
-  }, [token, getUserCart, getUserWishlist]);
+  }, [token]);
+
+  useEffect(() => {
+    // Fetch exchange rates once on mount
+    axios
+      .get(`${backendUrl}/api/exchange-rates`)
+      .then((res) => {
+        if (res.data.success) {
+          setExchangeRates(res.data.rates);
+        }
+      })
+      .catch((err) => console.error("Error fetching exchange rates:", err));
+  }, [backendUrl]);
+
+  const formatPrice = useCallback(
+    (amount) => formatPriceUtil(amount, selectedCurrency, exchangeRates),
+    [selectedCurrency, exchangeRates]
+  );
 
   const value = useMemo(
     () => ({
       products,
-      currency,
       delivery_fee,
       navigate,
       search,
@@ -304,6 +324,10 @@ const ShopContextProvider = (props) => {
       getUserWishlist,
       setWishlistItems,
       updateUserWishlist,
+      selectedCurrency,
+      setSelectedCurrency,
+      exchangeRates,
+      formatPrice,
       appliedCoupon,
       setAppliedCoupon,
       settings,
@@ -312,7 +336,6 @@ const ShopContextProvider = (props) => {
     }),
     [
       products,
-      currency,
       delivery_fee,
       navigate,
       search,
@@ -328,7 +351,12 @@ const ShopContextProvider = (props) => {
       wishlistItems,
       addToWishlist,
       getUserWishlist,
+      setWishlistItems,
       updateUserWishlist,
+      selectedCurrency,
+      setSelectedCurrency,
+      exchangeRates,
+      formatPrice,
       appliedCoupon,
       settings,
       categories,

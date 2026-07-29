@@ -8,7 +8,7 @@ import { productThumb } from "../utils/cloudinary";
 
 const WishListProductItem = ({ id, image, name, price, discount, oldPrice }) => {
   const {
-    currency,
+    formatPrice,
     addToWishlist,
     wishlistItems,
     updateUserWishlist,
@@ -88,12 +88,10 @@ const WishListProductItem = ({ id, image, name, price, discount, oldPrice }) => 
         <p className="text-xs xl:text-sm pt-1 px-2">{truncateByWord(name, 25)}</p>
         <div className="flex items-center justify-between px-2 py-1">
           <p className="text-sm font-medium">
-            {currency}
-            {price}{" "}
+            {formatPrice(price)}{" "}
             {oldPrice > 0 && (
               <span className="text-gray-400 line-through text-sm pl-2">
-                {currency}
-                {oldPrice}
+                {formatPrice(oldPrice)}
               </span>
             )}
           </p>

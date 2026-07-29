@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import axios from "axios";
 
 const Orders = () => {
-  const { currency, token, backendUrl, delivery_fee } =
+  const { formatPrice, token, backendUrl, delivery_fee } =
     useContext(ShopContext);
 
   const trackingStages = [
@@ -215,8 +215,7 @@ const Orders = () => {
                       </p>
 
                       <p className="text-sm text-gray-600 mt-1">
-                        Price: {currency}
-                        {item.price * item.quantity}
+                        Price: {formatPrice(item.price * item.quantity)}
                       </p>
 
                       <p className="text-sm text-gray-600 mt-1">
@@ -229,14 +228,14 @@ const Orders = () => {
                         {order.paymentMethod === "Partial" && order.paymentDetails ? (
                           <>
                             {" · "}
-                            advance ₹{order.paymentDetails.advanceAmount}
+                            advance {formatPrice(order.paymentDetails.advanceAmount)}
                             {order.paymentDetails.advanceRefunded
                               ? " (refunded)"
                               : order.paymentDetails.advanceKeptOnRto
                                 ? " (retained on RTO)"
                               : order.paymentDetails.balancePaid
                                 ? " (fully paid)"
-                                : ` · balance ₹${order.paymentDetails.balanceAmount} on delivery`}
+                                : ` · balance ${formatPrice(order.paymentDetails.balanceAmount)} on delivery`}
                           </>
                         ) : null}
                       </p>

@@ -1,7 +1,11 @@
 import StatusBadge from "./StatusBadge";
 import OrderTracker from "./OrderTracker";
+import { useContext } from "react";
+import { ShopContext } from "../context/ShopContext";
 
 const OrderCard = ({ order, onCancel, navigate }) => {
+  const { formatPrice } = useContext(ShopContext);
+
   return (
     <div className="bg-white rounded-xl shadow p-5 mb-6">
       <div className="flex justify-between text-sm text-gray-500 mb-4">
@@ -15,7 +19,7 @@ const OrderCard = ({ order, onCancel, navigate }) => {
           <div className="flex-1">
             <h3 className="font-semibold">{item.name}</h3>
             <p className="text-sm">Size: {item.size} | Qty: {item.quantity}</p>
-            <p className="font-bold">₹{item.price}</p>
+            <p className="font-bold">{formatPrice(item.price)}</p>
 
             <div className="flex gap-3 mt-2 items-center">
               <StatusBadge status={item.status} />

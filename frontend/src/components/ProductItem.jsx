@@ -6,7 +6,7 @@ import brand from "../brand";
 import { productThumb } from "../utils/cloudinary";
 
 const ProductItem = ({ id, image, name, price, discount, oldPrice }) => {
-  const { currency, addToWishlist, wishlistItems, updateUserWishlist } =
+  const { formatPrice, addToWishlist, wishlistItems, updateUserWishlist } =
     useContext(ShopContext);
 
   const [isLiked, setIsLiked] = useState(false);
@@ -104,13 +104,11 @@ const ProductItem = ({ id, image, name, price, discount, oldPrice }) => {
 
           <div className="mt-auto pt-1.5 flex items-baseline gap-2">
             <span className="text-sm font-semibold text-tz-navy">
-              {currency}
-              {Number(price).toLocaleString("en-IN")}
+              {formatPrice(price)}
             </span>
             {oldPrice > price && (
               <span className="text-[11px] text-tz-navy/35 line-through">
-                {currency}
-                {Number(oldPrice).toLocaleString("en-IN")}
+                {formatPrice(oldPrice)}
               </span>
             )}
           </div>

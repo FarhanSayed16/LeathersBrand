@@ -17,7 +17,7 @@ export default function HeroSlide({
         alt={title || brand.name}
         className="absolute inset-0 w-full h-full object-cover scale-105 animate-hero-zoom"
         loading={isPriority ? "eager" : "lazy"}
-        fetchPriority={isPriority ? "high" : "auto"}
+        fetchpriority={isPriority ? "high" : "auto"}
         onError={(e) => {
           e.currentTarget.src = brand.media.heroes?.[0]?.image || brand.media.placeholder;
         }}

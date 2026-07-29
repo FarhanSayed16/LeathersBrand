@@ -14,7 +14,7 @@ import { productGallery, productThumb } from '../utils/cloudinary'
 
 const Products = () => {
   const { productId } = useParams()
-  const { products, currency, addToCart, navigate } = useContext(ShopContext)
+  const { products, formatPrice, addToCart, navigate } = useContext(ShopContext)
   const [productData, setProductData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -373,18 +373,18 @@ const Products = () => {
 
             {/* Price */}
             <motion.div variants={itemVariants} className='flex items-baseline gap-3'>
-              <span className='text-3xl lg:text-4xl font-bold'>
-                {currency}{productData.price}
+              <span className="text-[26px] font-bold text-tz-navy">
+                {formatPrice(productData.price)}
               </span>
               {productData.oldPrice && (
-                <span className='text-lg lg:text-xl text-gray-400 line-through'>
-                  {currency}{productData.oldPrice}
+                <span className="text-[17px] text-tz-navy/40 line-through">
+                  {formatPrice(productData.oldPrice)}
                 </span>
               )}
               {productData.oldPrice && (
-                <span className='bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full'>
-                  Save {currency}{productData.oldPrice - productData.price}
-                </span>
+                <div className="bg-tz-pink/10 text-tz-pink px-2.5 py-1 rounded-md text-[13px] font-semibold tracking-wide border border-tz-pink/20">
+                  Save {formatPrice(productData.oldPrice - productData.price)}
+                </div>
               )}
             </motion.div>
 
@@ -565,7 +565,7 @@ const Products = () => {
                 "100% Original Product",
                 "Cash on Delivery is available on this product",
                 "Easy Return Policy within 7 days",
-                "Free shipping on orders above ₹999"
+                `Free shipping on orders above ${formatPrice(999)}`
               ].map((text, index) => (
                 <motion.p
                   key={index}

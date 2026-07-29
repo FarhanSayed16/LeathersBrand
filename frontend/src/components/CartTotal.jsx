@@ -3,8 +3,8 @@ import { ShopContext } from '../context/ShopContext'
 import Title from './Title'
 import { motion, AnimatePresence } from 'framer-motion'
 
-const CartTotal = () => {
-  const { currency, delivery_fee, getCartAmount, appliedCoupon } = useContext(ShopContext)
+const CartTotal = ({ isCart = false }) => {
+  const { formatPrice, delivery_fee, getCartAmount, appliedCoupon } = useContext(ShopContext)
  
   const subTotal = getCartAmount();
   const discount = appliedCoupon ? Math.round((appliedCoupon.discount / 100) * subTotal) : 0;
@@ -61,7 +61,7 @@ const CartTotal = () => {
             animate={{ scale: 1, color: '#374151' }}
             transition={{ type: "spring", stiffness: 300 }}
           >
-            {currency} {subTotal}.00
+            {formatPrice(subTotal)}
           </motion.span>
         </motion.div>
         
@@ -93,7 +93,7 @@ const CartTotal = () => {
                   initial={{ scale: 1.2 }}
                   animate={{ scale: 1 }}
                 >
-                  - {currency}{discount}.00
+                  - {formatPrice(discount)}
                 </motion.span>
               </motion.div>
               <motion.hr 
@@ -117,7 +117,7 @@ const CartTotal = () => {
               transition: { duration: 0.3 }
             } : {}}
           >
-            {currency} {delivery_fee}.00
+            {formatPrice(delivery_fee)}
           </motion.span>
         </motion.div>
         
@@ -139,7 +139,7 @@ const CartTotal = () => {
               transition: { duration: 0.5 }
             }}
           >
-            {currency} {total}.00
+            {formatPrice(total)}
           </motion.span>
         </motion.div>
       </div>
@@ -153,16 +153,16 @@ const CartTotal = () => {
       >
         <div className='text-center'>
           <div className='text-gray-500'>Subtotal</div>
-          <div className='font-semibold'>{currency}{subTotal}</div>
+          <div className='font-semibold'>{formatPrice(subTotal)}</div>
         </div>
         <div className='text-center'>
           <div className='text-gray-500'>Shipping</div>
-          <div className='font-semibold'>{currency}{delivery_fee}</div>
+          <div className='font-semibold'>{formatPrice(delivery_fee)}</div>
         </div>
         {appliedCoupon && (
           <div className='text-center'>
             <div className='text-gray-500'>Discount</div>
-            <div className='font-semibold text-green-600'>-{currency}{discount}</div>
+            <div className='font-semibold text-green-600'>-{formatPrice(discount)}</div>
           </div>
         )}
       </motion.div>
