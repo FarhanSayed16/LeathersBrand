@@ -47,12 +47,12 @@ const brand = {
 
   /* ---------- contact ---------- */
   contact: {
-    email: "hello@afiyaleathers.com",
-    phone: "",
-    whatsapp: "",
+    email: "afiyaleather8@gmail.com",
+    phone: "+91 9768657387",
+    whatsapp: "+919768657387",
     website: "www.afiyaleathers.com",
     websiteUrl: "https://afiyaleathers.com",
-    address: "India",
+    address: "B.30 Ground Floor Janta Chawl k.k.krishna Meman Marg, 90 Feet Road Mumbai Dharavi 400017, Mumbai, Maharashtra, India, 400017",
     hours: "Monday - Saturday: 10AM - 7PM",
     mapEmbedUrl: "",
     mapTitle: "Afiya Leathers Location",
