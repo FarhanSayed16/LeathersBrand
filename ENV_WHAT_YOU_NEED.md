@@ -34,17 +34,34 @@ CLOUDINARY_FOLDER=afiya-leathers
 
 Product uploads go under `afiya-leathers/products`.
 
-## SMTP (OTP + forgot password)
+## Transactional email (OTP + forgot password + orders)
 
-Required for customer register OTP. Prefer a real mailbox / Resend for production.
+**Production (Render): Resend HTTP API** — do not rely on Gmail SMTP.
 
 ```env
+MAIL_PROVIDER=resend
+RESEND_API_KEY=re_xxxxxxxx
+EMAIL_FROM="Afiya Leathers <orders@afiyaleathers.com>"
+ALLOW_DEV_OTP=false
+```
+
+1. Create an account at [resend.com](https://resend.com).
+2. Verify domain `afiyaleathers.com` (SPF/DKIM DNS). Until then, testing only works with Resend’s sandbox from-address to your own inbox.
+3. Set the vars on **Render**, then redeploy.
+4. `FRONTEND_URL` / `ADMIN_URL` must be the live site URLs (password-reset links).
+
+**Local optional fallback:**
+
+```env
+MAIL_PROVIDER=smtp
 SMTP_HOST=smtp.gmail.com
-SMTP_PORT=465
-SMTP_SECURE=true
+SMTP_PORT=587
+SMTP_SECURE=false
 SMTP_USER=...
 SMTP_PASS=...
 ```
+
+If `MAIL_PROVIDER` is unset, the mailer uses Resend when `RESEND_API_KEY` is present, otherwise SMTP.
 
 ## Frontend / Admin
 

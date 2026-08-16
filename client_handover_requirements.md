@@ -53,18 +53,24 @@ This document outlines every third-party account, API key, and credential you ne
 
 ---
 
-## 4. Transactional Emails (OTP & Invoices)
+## 4. Transactional Emails (OTP, resets, orders)
 
-### Gmail App Password (SMTP)
-*Used to send password reset OTPs, order confirmation emails, and invoices.*
-* **What you need:** `SMTP_USER` (The client's official email, e.g., admin@afiyaleathers.com) and an `SMTP_PASS` (16-character App Password).
-* **How to get them:**
-  1. Log into the client's Google Account.
-  2. Go to **Manage your Google Account** -> **Security**.
-  3. Enable **2-Step Verification** (required).
-  4. Once enabled, search for **App Passwords** in the Google Account search bar.
-  5. Create a new App Password named "Afiya Leathers Website".
-  6. Copy the 16-character password generated.
+### Resend (production — required on Render)
+
+Gmail SMTP is often blocked on Render. Production mail uses the **Resend HTTP API**.
+
+* **What you need:** `RESEND_API_KEY`, `MAIL_PROVIDER=resend`, `EMAIL_FROM` on a verified domain (e.g. `Afiya Leathers <orders@afiyaleathers.com>`).
+* **How to set up:**
+  1. Create an account at [resend.com](https://resend.com).
+  2. Add and verify `afiyaleathers.com` (SPF + DKIM DNS records Resend shows).
+  3. Create an API key and set it on the Render service.
+  4. Redeploy. Test register OTP to a real inbox.
+
+Until the domain is verified, Resend only delivers reliably to your own test inbox using their sandbox from-address.
+
+### Gmail SMTP (local fallback only)
+
+Optional for local `MAIL_PROVIDER=smtp`. Not the production path.
 
 ---
 
