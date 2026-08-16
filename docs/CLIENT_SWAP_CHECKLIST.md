@@ -21,7 +21,7 @@ Use this when reselling the monorepo to a new brand (single deploy per client â€
 
 | App | Key changes |
 |-----|-------------|
-| Backend | New `MONGODB_URI` DB name, `CLOUDINARY_FOLDER`, `ADMIN_EMAIL` / `ADMIN_PASSWORD`, CORS URLs, Razorpay, SMTP, Shiprocket |
+| Backend | New `MONGODB_URI` DB name, `CLOUDINARY_FOLDER`, `ADMIN_EMAIL` / `ADMIN_PASSWORD`, CORS URLs, Razorpay, **Resend** (`RESEND_API_KEY`, `EMAIL_FROM`), Shiprocket |
 | Frontend | `VITE_BACKEND_URL`, `VITE_RAZORPAY_KEY_ID` |
 | Admin | `VITE_BACKEND_URL` |
 
@@ -39,7 +39,7 @@ See `ENV_WHAT_YOU_NEED.md`.
 ## 5. Commerce smoke test
 
 - [ ] Admin login works
-- [ ] Customer register / OTP (SMTP) or seeded user login
+- [ ] Customer register / OTP (Resend) or seeded user login
 - [ ] Add to cart â†’ checkout COD
 - [ ] Razorpay test payment
 - [ ] Coupon apply
