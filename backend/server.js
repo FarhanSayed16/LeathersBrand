@@ -34,22 +34,38 @@ connectClodinary();
 
 // Middlewares
 app.use(express.json());
+function extraCorsOrigins() {
+  return String(process.env.CORS_ORIGINS || "")
+    .split(",")
+    .map((value) => value.trim().replace(/\/$/, ""))
+    .filter(Boolean);
+}
+
 const allowedOrigins = [
   process.env.FRONTEND_URL,
   process.env.ADMIN_URL,
   "http://localhost:5173",
   "http://localhost:5174",
+  "https://afiyaleather.com",
+  "https://www.afiyaleather.com",
   "https://g6xrghvh-5173.inc1.devtunnels.ms",
-  "https://g6xrghvh-5174.inc1.devtunnels.ms"
-].filter(Boolean);
+  "https://g6xrghvh-5174.inc1.devtunnels.ms",
+  ...extraCorsOrigins(),
+]
+  .filter(Boolean)
+  .map((value) => String(value).replace(/\/$/, ""));
 
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
-    } else {
-      callback(null, true); // Allow all origins for devtunnels
+      return;
     }
+    if (process.env.NODE_ENV !== "production") {
+      callback(null, true);
+      return;
+    }
+    callback(new Error(`CORS blocked: ${origin}`));
   },
   credentials: true
 }));

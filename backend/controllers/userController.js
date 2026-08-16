@@ -59,11 +59,13 @@ const sendOtpEmail = async (email, otp) => {
     to: email,
     subject: brand.email?.verifyEmailSubject || `Verify Your Email — ${brand.name}`,
     html: `
-      <h2>Email Verification</h2>
-      <p>Your one-time verification code:</p>
-      <h1 style="letter-spacing:4px">${otp}</h1>
-      <p>This code is valid for <strong>10 minutes</strong>.</p>
-      <p>If you did not create a ${brand.name} account, you can ignore this email.</p>
+      <div style="font-family:Georgia,serif;color:#2C1810;max-width:480px">
+        <h2 style="margin:0 0 12px">${brand.name || "Afiya Leathers"}</h2>
+        <p>Your one-time verification code:</p>
+        <p style="font-size:28px;letter-spacing:6px;font-weight:700;margin:16px 0">${otp}</p>
+        <p>This code is valid for <strong>10 minutes</strong>.</p>
+        <p style="color:#6B3A2A;font-size:13px">If you did not create this account, you can ignore this email.</p>
+      </div>
     `,
   });
 };
