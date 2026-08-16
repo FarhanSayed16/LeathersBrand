@@ -6,6 +6,9 @@ import {
   FaPaperPlane,
   FaCheckCircle,
   FaExclamationCircle,
+  FaWhatsapp,
+  FaInstagram,
+  FaFacebookF,
 } from "react-icons/fa";
 import brand from "../brand";
 import { ShopContext } from "../context/ShopContext";
@@ -81,33 +84,73 @@ const Contact = () => {
       <section className="max-w-3xl mx-auto px-4 pb-16 sm:pb-20 relative z-10">
         <div className="flex flex-wrap items-center justify-center gap-10 sm:gap-16">
           {brand.contact.email && (
-            <div className="flex flex-col items-center text-center group cursor-pointer">
+            <a href={`mailto:${brand.contact.email}`} className="flex flex-col items-center text-center group">
               <div className="w-14 h-14 rounded-full bg-white shadow-sm border border-tz-pink/10 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:shadow-md transition-all duration-300">
                 <FaEnvelope className="text-tz-pink" size={18} />
               </div>
               <h3 className="text-sm font-bold text-tz-navy mb-1 tracking-wide">Email</h3>
               <p className="text-sm text-tz-navy/60">{brand.contact.email}</p>
-            </div>
+            </a>
           )}
           {brand.contact.phone && (
-            <div className="flex flex-col items-center text-center group cursor-pointer">
+            <a href={brand.contact.phoneHref || `tel:${String(brand.contact.phone).replace(/\s/g, "")}`} className="flex flex-col items-center text-center group">
               <div className="w-14 h-14 rounded-full bg-white shadow-sm border border-tz-pink/10 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:shadow-md transition-all duration-300">
                 <FaPhone className="text-tz-pink" size={18} />
               </div>
               <h3 className="text-sm font-bold text-tz-navy mb-1 tracking-wide">Phone</h3>
               <p className="text-sm text-tz-navy/60">{brand.contact.phone}</p>
-            </div>
+            </a>
+          )}
+          {(brand.contact.whatsappUrl || brand.social.whatsapp) && (
+            <a
+              href={brand.contact.whatsappUrl || brand.social.whatsapp}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex flex-col items-center text-center group"
+            >
+              <div className="w-14 h-14 rounded-full bg-white shadow-sm border border-tz-pink/10 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:shadow-md transition-all duration-300">
+                <FaWhatsapp className="text-tz-pink" size={18} />
+              </div>
+              <h3 className="text-sm font-bold text-tz-navy mb-1 tracking-wide">WhatsApp</h3>
+              <p className="text-sm text-tz-navy/60">{brand.contact.phone}</p>
+            </a>
           )}
           {brand.contact.address && (
-            <div className="flex flex-col items-center text-center group cursor-pointer">
+            <div className="flex flex-col items-center text-center group">
               <div className="w-14 h-14 rounded-full bg-white shadow-sm border border-tz-pink/10 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:shadow-md transition-all duration-300">
                 <FaMapMarkerAlt className="text-tz-pink" size={18} />
               </div>
               <h3 className="text-sm font-bold text-tz-navy mb-1 tracking-wide">Store</h3>
-              <p className="text-sm text-tz-navy/60 max-w-[150px]">{brand.contact.address}</p>
+              <p className="text-sm text-tz-navy/60 max-w-[180px]">{brand.contact.address}</p>
             </div>
           )}
         </div>
+        {(brand.social.instagram || brand.social.facebook) && (
+          <div className="flex justify-center gap-3 mt-10">
+            {brand.social.instagram && (
+              <a
+                href={brand.social.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 rounded-full bg-white border border-tz-pink/15 flex items-center justify-center text-tz-navy hover:text-tz-pink"
+                aria-label="Instagram"
+              >
+                <FaInstagram size={16} />
+              </a>
+            )}
+            {brand.social.facebook && (
+              <a
+                href={brand.social.facebook}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 rounded-full bg-white border border-tz-pink/15 flex items-center justify-center text-tz-navy hover:text-tz-pink"
+                aria-label="Facebook"
+              >
+                <FaFacebookF size={16} />
+              </a>
+            )}
+          </div>
+        )}
       </section>
 
       {/* Centered Form Section */}

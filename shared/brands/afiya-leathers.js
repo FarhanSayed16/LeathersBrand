@@ -48,10 +48,12 @@ const brand = {
   /* ---------- contact ---------- */
   contact: {
     email: "afiyaleather8@gmail.com",
-    phone: "+91 9768657387",
-    whatsapp: "+919768657387",
-    website: "www.afiyaleathers.com",
-    websiteUrl: "https://afiyaleathers.com",
+    phone: "+91 97686 57387",
+    phoneHref: "tel:+919768657387",
+    whatsapp: "+91 97686 57387",
+    whatsappUrl: "https://wa.me/message/INQEUCKOIIR4I1",
+    website: "www.afiyaleather.com",
+    websiteUrl: "https://afiyaleather.com",
     address: "B.30 Ground Floor Janta Chawl k.k.krishna Meman Marg, 90 Feet Road Mumbai Dharavi 400017, Mumbai, Maharashtra, India, 400017",
     hours: "Monday - Saturday: 10AM - 7PM",
     mapEmbedUrl: "",
@@ -146,10 +148,11 @@ const brand = {
 
   /* ---------- social (empty href = hide) ---------- */
   social: {
-    facebook: "",
+    facebook: "https://www.facebook.com/share/19N7iT3kiv/",
     twitter: "",
-    instagram: "https://instagram.com/afiyaleathers",
+    instagram: "https://www.instagram.com/afiyaleather",
     linkedin: "",
+    whatsapp: "https://wa.me/message/INQEUCKOIIR4I1",
   },
 
   /* ---------- commerce display ---------- */

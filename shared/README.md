@@ -12,7 +12,7 @@ One file controls brand identity for frontend, admin, and backend.
 2. Change `shared/brand.config.js` to re-export the new file.
 3. Replace logo + media under `frontend/public/brand/` and `admin/public/brand/`.
 4. Point env at a **new Mongo DB name** and set `CLOUDINARY_FOLDER` for that client.
-5. Update `ADMIN_EMAIL` / `ADMIN_PASSWORD`, CORS URLs, Razorpay, SMTP.
+5. Update `ADMIN_EMAIL` / `ADMIN_PASSWORD`, CORS URLs, Razorpay, Resend (`RESEND_API_KEY`, `EMAIL_FROM`).
 6. Restart frontend, admin, and backend so Vite/Node pick up the config.
 
 Full operator list: **`CLIENT_SWAP_CHECKLIST.md`**.

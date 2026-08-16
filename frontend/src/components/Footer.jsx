@@ -4,12 +4,34 @@ import { Link } from "react-router-dom";
 import { FaPhoneAlt, FaEnvelope, FaMapMarkerAlt, FaWhatsapp } from "react-icons/fa";
 import brand from "../brand";
 
+const iconBtn =
+  "w-9 h-9 inline-flex items-center justify-center rounded-full bg-white/10 text-white hover:bg-tz-pink transition-colors";
+
 const Footer = () => {
+  const phoneHref = brand.contact.phoneHref || `tel:${String(brand.contact.phone || "").replace(/\s/g, "")}`;
+  const whatsappHref = brand.contact.whatsappUrl || brand.social.whatsapp;
+  const mailHref = brand.contact.email ? `mailto:${brand.contact.email}` : "";
+
   const contactItems = [
-    brand.contact.phone && { icon: FaPhoneAlt, text: brand.contact.phone },
-    brand.contact.email && { icon: FaEnvelope, text: brand.contact.email },
-    brand.contact.address && { icon: FaMapMarkerAlt, text: brand.contact.address },
-    brand.contact.whatsapp && { icon: FaWhatsapp, text: brand.contact.whatsapp },
+    brand.contact.phone && {
+      icon: FaPhoneAlt,
+      text: brand.contact.phone,
+      href: phoneHref,
+    },
+    brand.contact.email && {
+      icon: FaEnvelope,
+      text: brand.contact.email,
+      href: mailHref,
+    },
+    brand.contact.address && {
+      icon: FaMapMarkerAlt,
+      text: brand.contact.address,
+    },
+    whatsappHref && {
+      icon: FaWhatsapp,
+      text: "Chat on WhatsApp",
+      href: whatsappHref,
+    },
   ].filter(Boolean);
 
   return (
@@ -27,17 +49,30 @@ const Footer = () => {
             {brand.footer.blurb}
           </p>
           <div className="flex gap-2 mt-5">
+            {brand.social.instagram && (
+              <a href={brand.social.instagram} target="_blank" rel="noopener noreferrer" className={iconBtn} aria-label="Instagram">
+                <FaInstagram size={12} />
+              </a>
+            )}
             {brand.social.facebook && (
-              <a href={brand.social.facebook} className="w-9 h-9 inline-flex items-center justify-center rounded-full bg-white/10 text-white hover:bg-tz-pink transition-colors" aria-label="Facebook"><FaFacebookF size={12} /></a>
+              <a href={brand.social.facebook} target="_blank" rel="noopener noreferrer" className={iconBtn} aria-label="Facebook">
+                <FaFacebookF size={12} />
+              </a>
+            )}
+            {whatsappHref && (
+              <a href={whatsappHref} target="_blank" rel="noopener noreferrer" className={iconBtn} aria-label="WhatsApp">
+                <FaWhatsapp size={12} />
+              </a>
             )}
             {brand.social.twitter && (
-              <a href={brand.social.twitter} className="w-9 h-9 inline-flex items-center justify-center rounded-full bg-white/10 text-white hover:bg-tz-pink transition-colors" aria-label="Twitter"><FaTwitter size={12} /></a>
+              <a href={brand.social.twitter} target="_blank" rel="noopener noreferrer" className={iconBtn} aria-label="Twitter">
+                <FaTwitter size={12} />
+              </a>
             )}
             {brand.social.linkedin && (
-              <a href={brand.social.linkedin} className="w-9 h-9 inline-flex items-center justify-center rounded-full bg-white/10 text-white hover:bg-tz-pink transition-colors" aria-label="LinkedIn"><FaLinkedinIn size={12} /></a>
-            )}
-            {brand.social.instagram && (
-              <a href={brand.social.instagram} className="w-9 h-9 inline-flex items-center justify-center rounded-full bg-white/10 text-white hover:bg-tz-pink transition-colors" aria-label="Instagram"><FaInstagram size={12} /></a>
+              <a href={brand.social.linkedin} target="_blank" rel="noopener noreferrer" className={iconBtn} aria-label="LinkedIn">
+                <FaLinkedinIn size={12} />
+              </a>
             )}
           </div>
         </div>
@@ -60,16 +95,29 @@ const Footer = () => {
           <ul className="mt-4 space-y-3 text-sm text-white/55">
             {contactItems.map((item) => {
               const Icon = item.icon;
-              return (
-                <li key={item.text} className="flex items-start gap-3">
+              const body = (
+                <>
                   <Icon className="text-tz-pink shrink-0 mt-0.5" size={12} />
                   <span>{item.text}</span>
+                </>
+              );
+              return (
+                <li key={item.text}>
+                  {item.href ? (
+                    <a
+                      href={item.href}
+                      className="flex items-start gap-3 hover:text-white transition-colors"
+                      target={item.href.startsWith("http") ? "_blank" : undefined}
+                      rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
+                    >
+                      {body}
+                    </a>
+                  ) : (
+                    <span className="flex items-start gap-3">{body}</span>
+                  )}
                 </li>
               );
             })}
-            {contactItems.length === 0 && (
-              <li className="text-white/40">{brand.contact.email || "hello@afiyaleathers.com"}</li>
-            )}
           </ul>
         </div>
       </div>
