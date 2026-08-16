@@ -48,6 +48,8 @@ const allowedOrigins = [
   "http://localhost:5174",
   "https://afiyaleather.com",
   "https://www.afiyaleather.com",
+  "https://leathers-brand.vercel.app",
+  "https://leathers-brand-frontend.vercel.app",
   "https://g6xrghvh-5173.inc1.devtunnels.ms",
   "https://g6xrghvh-5174.inc1.devtunnels.ms",
   ...extraCorsOrigins(),
@@ -55,20 +57,30 @@ const allowedOrigins = [
   .filter(Boolean)
   .map((value) => String(value).replace(/\/$/, ""));
 
+function isAllowedOrigin(origin) {
+  if (!origin) return true;
+  if (allowedOrigins.includes(origin)) return true;
+  try {
+    const { hostname, protocol } = new URL(origin);
+    if (protocol === "https:" && hostname.endsWith(".vercel.app")) return true;
+  } catch {
+    return false;
+  }
+  return false;
+}
+
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (isAllowedOrigin(origin)) {
       callback(null, true);
       return;
     }
-    if (process.env.NODE_ENV !== "production") {
-      callback(null, true);
-      return;
-    }
-    callback(new Error(`CORS blocked: ${origin}`));
+    console.warn(`[CORS] blocked origin: ${origin}`);
+    callback(null, false);
   },
-  credentials: true
+  credentials: true,
 }));
+app.options("*", cors());
 
 // Rate Limiter — general API
 const limiter = rateLimit({

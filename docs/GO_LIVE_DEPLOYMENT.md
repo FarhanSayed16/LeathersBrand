@@ -63,7 +63,8 @@ JWT_SECRET=
 
 FRONTEND_URL=https://afiyaleather.com
 ADMIN_URL=https://admin.afiyaleather.com
-CORS_ORIGINS=https://afiyaleather.com,https://www.afiyaleather.com,https://admin.afiyaleather.com
+CORS_ORIGINS=https://afiyaleather.com,https://www.afiyaleather.com,https://leathers-brand.vercel.app,https://leathers-brand-frontend.vercel.app
+
 
 ADMIN_EMAIL=
 ADMIN_PASSWORD=
@@ -92,7 +93,7 @@ SHIPROCKET_PICKUP_LOCATION=Primary
 SHIPROCKET_RETURN_LOCATION=Primary
 SHIPROCKET_PICKUP_PINCODE=400017
 
-PARTIAL_PAYMENT_ENABLED=false
+PARTIAL_PAYMENT_ENABLED=true
 PARTIAL_PAYMENT_PERCENT_DEFAULT=25
 PARTIAL_PAYMENT_MIN_PERCENT=10
 PARTIAL_PAYMENT_MAX_PERCENT=50
